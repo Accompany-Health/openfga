@@ -20,6 +20,71 @@
 
 ---
 
+## Accompany Health Fork
+
+This repo is a vendored fork of upstream [`openfga/openfga`](https://github.com/openfga/openfga),
+synced via the `upstream` git remote. **As of this writing it has zero
+Accompany-specific commits** — `HEAD` matches `upstream/main` — so it is
+primarily third-party code, not Accompany-authored.
+
+### What this repo is
+
+A mirror of the OpenFGA ReBAC authorization engine, kept in sync with
+upstream so Accompany Health can run/deploy it and track its dependency
+chain through normal GitHub tooling (Dependabot, CODEOWNERS, etc).
+
+### What this owns
+
+Nothing Accompany-specific yet. If application-level patches are ever added
+here instead of upstreamed, they should live clearly separated from
+upstream-owned directories — see [`coding-guidelines.md`](coding-guidelines.md).
+
+### Related systems
+
+Services in this environment talk to a running OpenFGA instance over
+HTTP/gRPC via the separate [`openfga/go-sdk`](https://github.com/openfga/go-sdk)
+client, not by importing this repo. See [`docs/accompany/dependencies.md`](docs/accompany/dependencies.md).
+
+### Stack
+
+Go (see `go.mod`), gRPC + HTTP (Gin), Postgres/MySQL/SQLite storage
+backends — all upstream's own stack, unchanged.
+
+### Local Development
+
+See [`docs/accompany/local-development.md`](docs/accompany/local-development.md),
+which points into upstream's own `AGENTS.md` and `Makefile` for the actual
+commands.
+
+### Environment variables
+
+None are Accompany-specific. See [`docs/accompany/local-development.md`](docs/accompany/local-development.md).
+
+### Where key things live
+
+See `context.yaml` → `important_paths`, and upstream's own [`AGENTS.md`](AGENTS.md) → "Architecture".
+
+### How to connect to dependent services
+
+Not applicable to this repo directly — see [`docs/accompany/dependencies.md`](docs/accompany/dependencies.md)
+for how the *deployed* instance is reached by other Accompany services.
+
+### Deployment
+
+Not managed from this repo as far as this audit could determine — see the
+TODO in [`docs/accompany/architecture.md`](docs/accompany/architecture.md).
+
+### Troubleshooting
+
+See [`docs/accompany/troubleshooting.md`](docs/accompany/troubleshooting.md).
+
+### Ownership
+
+See `context.yaml` and `.github/CODEOWNERS`. Owning team is
+`@Accompany-Health/ninjas`. Slack: `#eng-ninjas`.
+
+---
+
 **OpenFGA** is a high-performance, flexible authorization/permission engine inspired by [Google Zanzibar](https://research.google/pubs/pub48190/).
 It helps developers easily model and enforce fine-grained access control in their applications.
 
@@ -90,6 +155,13 @@ in-memory datastore by running the following commands:
 docker pull openfga/openfga
 docker run -p 8080:8080 -p 3000:3000 openfga/openfga run
 ```
+
+> [!NOTE]
+> When the HTTP server is enabled, it will attempt to establish an internal client connection to the gRPC server via unix domain socket.
+> When it is not possible to establish a UDS, the client connection automatically falls back to using a TCP socket.
+>
+> If running the Docker image using the `--read-only` option, the `--tmpfs` option must also be set in order to enabled use of the unix domain socket.
+> For example `--tmpfs /tmp`
 
 ### Docker Compose
 

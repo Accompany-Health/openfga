@@ -1,4 +1,9 @@
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
-* @openfga/backend
-README.md @openfga/product @openfga/community @openfga/backend
-pkg/storage/ @openfga/backend @openfga/be-storage-maintainers
+#
+# This repo is a vendored fork of github.com/openfga/openfga (see README.md
+# "Accompany Health Fork"). Upstream's CODEOWNERS referenced @openfga/* teams
+# that don't exist in the Accompany-Health org; replaced below with the
+# default owner per ah-agents repository-standards.md (Go library/service
+# repos default to @Accompany-Health/ninjas absent clear evidence otherwise —
+# see context.yaml for the open ownership question on this repo specifically).
+* @Accompany-Health/ninjas

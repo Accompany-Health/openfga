@@ -1,0 +1,62 @@
+# NOTE: This repo is a vendored fork of github.com/openfga/openfga (mirrored
+# from upstream main, zero Accompany-specific commits as of this writing — see
+# README.md "Accompany Health Fork" section). This manifest describes how
+# Accompany Health runs it; it is not upstream-authored.
+name: openfga
+type: service
+language:
+  - go
+owner:
+  team: ninjas
+  slack: "#eng-ninjas"
+  github: "@Accompany-Health/ninjas"
+  oncall: "" # TODO(human): confirm on-call rotation, or tier2/tier3 if none exists
+tier: tier2 # TODO(human): confirm — observed consumers (orion-be, vela, ophiuchus) treat it as tier1-adjacent auth infra
+lifecycle: production
+domain:
+  - auth
+interfaces:
+  inbound:
+    - http
+    - grpc
+  outbound:
+    - postgres
+    - mysql
+runtime:
+  run_local: "make dev-run"
+  test: "make test"
+  build: "make build"
+entrypoints:
+  - path: "cmd/run/run.go"
+important_paths:
+  - path: "pkg/server"
+    purpose: "gRPC/HTTP API handlers"
+  - path: "pkg/server/commands"
+    purpose: "Business logic layer (decoupled from transport)"
+  - path: "internal/graph"
+    purpose: "Core authorization check engine (LocalChecker, resolver chain)"
+  - path: "pkg/storage"
+    purpose: "OpenFGADatastore interface + implementations (memory, postgres, mysql, sqlite)"
+  - path: "pkg/typesystem"
+    purpose: "Authorization model parsing/validation"
+  - path: "AGENTS.md"
+    purpose: "Upstream-authored AI agent guidance — architecture, conventions, dev commands (kept as-is, not duplicated here)"
+dependencies:
+  internal: [] # TODO(human): confirm — no repo in this environment imports this module directly; consumers talk to a running instance over HTTP/gRPC via openfga/go-sdk (a separate repo)
+  infra:
+    - postgres
+    - mysql
+  external: []
+  related:
+    - orion-be # consumes a deployed openfga instance via openfga/go-sdk
+    - vela # consumes a deployed openfga instance via openfga/go-sdk
+    - ophiuchus # consumes a deployed openfga instance via openfga/go-sdk
+data_stores:
+  - postgres
+  - mysql
+external_services: []
+docs:
+  readme: "./README.md"
+  architecture: "./docs/accompany/architecture.md"
+  local_dev: "./docs/accompany/local-development.md"
+  runbook: ""
